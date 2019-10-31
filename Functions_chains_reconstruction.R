@@ -473,7 +473,7 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                                  adding_noise, lambda_noise,
                                  init_poisson_scale, move_poisson_scale,
                                  init_sigma, move_sigma,
-                                 init_pi, move_pi){
+                                 init_pi, move_pi, prior_pi){
   ## Adding noise on dates if needed ##
   if(adding_noise){
     dates <- round(dates + rpois(length(dates), 
@@ -525,7 +525,8 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                           move_sigma = move_sigma,
                           init_sigma = init_sigma,
                           move_pi = move_pi,
-                          init_pi = init_pi)
+                          init_pi = init_pi, 
+                          prior_pi = prior_pi)
   
   # Reconstruction of chains #
   results_mcmc <- ComputeBayesian(outbreaker_data = data_outbreaker, 
