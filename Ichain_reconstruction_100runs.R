@@ -23,7 +23,7 @@ runs = 100
 
 n_iter_mcmc <- 50000
 n_sample <- n_iter_mcmc*0.0001
-burning <- n_iter_mcmc*0.01
+burning <- n_iter_mcmc*0.1
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -36,7 +36,7 @@ init_psi <- 1
 move_psi <- TRUE
 
 # Adding noise on dates of infection #
-adding_noise <- FALSE
+adding_noise <- TRUE
 lambda_noise <- 3.5
 
 # Other parameters #
@@ -251,6 +251,6 @@ out <- parLapply(cl, 1:runs, function(line) {
   return(output)
 })
 
-saveRDS(out, file = paste0("1-results_incomplete_",n_iter_mcmc,"_",n_sample,"_parLapply_scenario1.rds"))
+saveRDS(out, file = paste0("1-Ichain_n",n_iter_mcmc,"_b",burning,"_t",n_sample,"_s2.rds"))
 
 stopCluster(cl)

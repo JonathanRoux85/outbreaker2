@@ -4,7 +4,6 @@
 library(outbreaker2)
 library(data.table)
 library(fitdistrplus)
-library(parallel)
 
 ###################################
 #### Loading of simulated data ####
@@ -18,12 +17,9 @@ source("./Functions_chains_reconstruction.R")
 ###########################
 #### Global parameters ####
 ###########################
-cores = 8
-runs = 100
-
 n_iter_mcmc <- 50000
 n_sample <- n_iter_mcmc*0.0001
-burning <- n_iter_mcmc*0.01
+burning <- n_iter_mcmc*0.1
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -36,7 +32,7 @@ init_psi <- 1
 move_psi <- TRUE
 
 # Adding noise on dates of infection #
-adding_noise <- TRUE
+adding_noise <- FALSE
 lambda_noise <- 3.5
 
 # Other parameters #
@@ -131,54 +127,30 @@ setnames(generation_time.dist,
 w <- generation_time.dist[, p]
 
 
-########################################
-#### Parameters for parallelization ####
-########################################
-cl <- makeCluster(cores)
-clusterExport(cl, c("dates", "w", "n_cases", "fakeMat", 
-                    "ids", "detect100", "chains_detect100_bind", 
-                    "n_iter_mcmc", "n_sample", "burning",
-                    "min.support", "prior_alpha", "adding_noise", 
-                    "lambda_noise", "move_sigma", "init_sigma",
-                    "move_pi", "init_pi", "init_psi", 
-                    "move_psi", "prior_pi"))
-clusterEvalQ(cl, library(outbreaker2))
-clusterEvalQ(cl, library(data.table))
-clusterEvalQ(cl, library(fitdistrplus))
-clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
-
 ################################
 #### Chains' reconstruction ####
 ################################
-out <- parLapply(cl, 1:runs, function(line) {
-  output = ChainsReconstruction(dates = dates, 
-                                w = w, 
-                                n_cases = n_cases, 
-                                fakeMat = fakeMat, 
-                                ids = ids,
-                                detect100 = detect100, 
-                                chains_detect100_bind = chains_detect100_bind, 
-                                n_iter_mcmc = n_iter_mcmc, 
-                                n_sample = n_sample, 
-                                burning = burning,
-                                min.support = min.support,
-                                prior_alpha = prior_alpha,
-                                adding_noise = adding_noise, 
-                                lambda_noise = lambda_noise,
-                                move_sigma = move_sigma,
-                                init_sigma = init_sigma,
-                                move_pi = move_pi,
-                                init_pi = init_pi,
-                                init_psi = init_psi, 
-                                move_psi = move_psi,
-                                prior_pi = prior_pi)
-  return(output)
-})
+out <- ChainsReconstruction(dates = dates, 
+                            w = w, 
+                            n_cases = n_cases, 
+                            fakeMat = fakeMat, 
+                            ids = ids,
+                            detect100 = detect100, 
+                            chains_detect100_bind = chains_detect100_bind, 
+                            n_iter_mcmc = n_iter_mcmc, 
+                            n_sample = n_sample, 
+                            burning = burning,
+                            min.support = min.support,
+                            prior_alpha = prior_alpha,
+                            adding_noise = adding_noise, 
+                            lambda_noise = lambda_noise,
+                            move_sigma = move_sigma,
+                            init_sigma = init_sigma,
+                            move_pi = move_pi,
+                            init_pi = init_pi,
+                            init_psi = init_psi, 
+                            move_psi = move_psi,
+                            prior_pi = prior_pi)
 
-saveRDS(out, file = paste0("1-results_",n_iter_mcmc,"_",n_sample,"_parLapply_scenario2.rds"))
-
-stopCluster(cl)
-
-
-
+saveRDS(out, file = paste0("1-Cchain_n",n_iter_mcmc,"_b",burning,"_t",n_sample,"_s1.rds"))
 
