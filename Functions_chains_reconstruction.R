@@ -466,7 +466,8 @@ ComputeParametersChains_chainlength <- function(data, min_support = NULL, real_d
 ########################################
 #### Function to reconstruct chains ####
 ########################################
-ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
+ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids, 
+                                 f_dens = NULL,
                                  detect100, chains_detect100_bind, 
                                  n_iter_mcmc, n_sample, min.support,
                                  prior_alpha, burning,
@@ -482,11 +483,21 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
   }
   
   # Data #
-  data_outbreaker <- outbreaker_data(dates = dates,
-                                     w_dens = w,
-                                     n_cases = n_cases,
-                                     hosp_matrix = fakeMat,
-                                     ids = ids)
+  # Check incubation time #
+  if(is.null(f_dens)){
+    data_outbreaker <- outbreaker_data(dates = dates,
+                                       w_dens = w,
+                                       n_cases = n_cases,
+                                       hosp_matrix = fakeMat,
+                                       ids = ids)
+  }
+  else
+    data_outbreaker <- outbreaker_data(dates = dates,
+                                       w_dens = w,
+                                       n_cases = n_cases,
+                                       hosp_matrix = fakeMat,
+                                       ids = ids,
+                                       f_dens = f_dens)
   
   ## Identification of imported cases ##
   check.importation <- merge(detect100[, n_line := seq_len(.N)],
@@ -513,10 +524,8 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
   config <- create_config(prior_psi = c(1, 1),
                           move_psi = move_psi,
                           init_potential_colonised = n_cases*init_psi,
-                          # sd_potential_colonised = 5,
                           pb = TRUE,
                           find_import = FALSE,
-                          outlier_threshold = 5,
                           data = data_outbreaker,
                           init_tree = imported,
                           n_iter = n_iter_mcmc, 
@@ -550,18 +559,28 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
 #### Function to reconstruct chains based on real data ####
 ###########################################################
 RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
-                                     imported,
+                                     f_dens = NULL, imported,
                                      n_iter_mcmc, n_sample,
                                      prior_alpha, burning,
                                      init_psi, move_psi,
                                      init_sigma, move_sigma,
                                      init_pi, move_pi, prior_pi){
   # Data #
-  data_outbreaker <- outbreaker_data(dates = dates,
-                                     w_dens = w,
-                                     n_cases = n_cases,
-                                     hosp_matrix = transfers,
-                                     ids = ids)
+  # Check incubation time #
+  if(is.null(f_dens)){
+    data_outbreaker <- outbreaker_data(dates = dates,
+                                       w_dens = w,
+                                       n_cases = n_cases,
+                                       hosp_matrix = fakeMat,
+                                       ids = ids)
+  }
+  else
+    data_outbreaker <- outbreaker_data(dates = dates,
+                                       w_dens = w,
+                                       n_cases = n_cases,
+                                       hosp_matrix = fakeMat,
+                                       ids = ids,
+                                       f_dens = f_dens)
   
   imported <- ifelse(imported == 1, NA_integer_, 1)
   
@@ -579,10 +598,8 @@ RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
   config <- create_config(prior_psi = c(1, 1),
                           move_psi = move_psi,
                           init_potential_colonised = n_cases*init_psi,
-                          # sd_potential_colonised = 5,
                           pb = TRUE,
                           find_import = FALSE,
-                          outlier_threshold = 5,
                           data = data_outbreaker,
                           init_tree = imported,
                           n_iter = n_iter_mcmc, 
