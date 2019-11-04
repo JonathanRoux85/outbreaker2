@@ -22,18 +22,18 @@
 
 // ---------------------------
 
-// Movement of the scaling factor between observed and unobserved colonised 'poisson_scale'
+// Movement of the scaling factor between observed and unobserved colonised 'psi'
 // is done using a dumb normal proposal. 
 
 // [[Rcpp::export(rng = true)]]
-Rcpp::List cpp_move_poisson_scale(Rcpp::List param, Rcpp::List data, Rcpp::List config,
+Rcpp::List cpp_move_psi(Rcpp::List param, Rcpp::List data, Rcpp::List config,
                        Rcpp::RObject custom_ll = R_NilValue,
                        Rcpp::RObject custom_prior = R_NilValue) {
   
   // deep copy here for now, ultimately should be an arg.
   Rcpp::List new_param = clone(param);
-  Rcpp::NumericVector poisson_scale = param["poisson_scale"];
-  Rcpp::NumericVector new_poisson_scale = new_param["poisson_scale"];
+  Rcpp::NumericVector psi = param["psi"];
+  Rcpp::NumericVector new_psi = new_param["psi"];
   Rcpp::IntegerVector potential_colonised = param["potential_colonised"];
   Rcpp::IntegerVector new_potential_colonised = new_param["potential_colonised"];
   Rcpp::IntegerVector alpha = param["alpha"];
@@ -41,20 +41,20 @@ Rcpp::List cpp_move_poisson_scale(Rcpp::List param, Rcpp::List data, Rcpp::List 
   
   size_t N = static_cast<size_t>(data["N"]);
   
-  double sd_poisson_scale = static_cast<double>(config["sd_poisson_scale"]);
+  double sd_psi = static_cast<double>(config["sd_psi"]);
   
   double old_logpost = 0.0, new_logpost = 0.0, p_accept = 0.0;
   
-  // proposal (normal distribution with SD: config$sd_poisson_scale)
+  // proposal (normal distribution with SD: config$sd_psi)
   
-  new_poisson_scale[0] += R::rnorm(0.0, sd_poisson_scale); // new proposed value
+  new_psi[0] += R::rnorm(0.0, sd_psi); // new proposed value
   
   for (size_t i = 0; i < N; i++) {
-      new_potential_colonised[i] = std::round((new_poisson_scale[0]*n_cases[i]));
+      new_potential_colonised[i] = std::round((new_psi[0]*n_cases[i]));
   }
   
-  // automatic rejection of negative poisson_scale
-  if (new_poisson_scale[0] < 0.0) {
+  // automatic rejection of negative psi
+  if (new_psi[0] < 0.0) {
     return param;
   }
   
@@ -63,12 +63,10 @@ Rcpp::List cpp_move_poisson_scale(Rcpp::List param, Rcpp::List data, Rcpp::List 
   new_logpost = cpp_ll_patient_transfer(data, new_param, R_NilValue, custom_ll);
   
   // compute priors
-  
-  old_logpost += cpp_prior_poisson_scale(param, config, custom_prior);
-  new_logpost += cpp_prior_poisson_scale(new_param, config, custom_prior);
+  old_logpost += cpp_prior_psi(param, config, custom_prior);
+  new_logpost += cpp_prior_psi(new_param, config, custom_prior);
   
   // acceptance term
-  
   p_accept = exp(new_logpost - old_logpost);
   
   // acceptance: the new value is already in mu, so we only act if the move is
@@ -123,13 +121,11 @@ Rcpp::List cpp_move_mu(Rcpp::List param, Rcpp::List data, Rcpp::List config,
 
 
   // compute priors
-
   old_logpost += cpp_prior_mu(param, config, custom_prior);
   new_logpost += cpp_prior_mu(new_param, config, custom_prior);
 
 
   // acceptance term
-
   p_accept = exp(new_logpost - old_logpost);
 
 
@@ -590,8 +586,8 @@ Rcpp::List cpp_move_swap_cases(Rcpp::List param, Rcpp::List data,
 
   for (size_t i = 0; i < N; i++) {
 
-    // only non-NA ancestries are moved, if there is at least 1 choice
-    if (alpha[i] != NA_INTEGER && sum(t_inf < t_inf[i]) > 0) {
+    // only non-NA ancestries are moved, if there is at least 1 choice and if the ancestor is not an episode due to importation
+    if (alpha[i] != NA_INTEGER && sum(t_inf < t_inf[i]) > 0 && alpha[alpha[i] - 1] != NA_INTEGER) {
 
       // The local likelihood is defined as the likelihood computed for the
       // cases affected by the swap; these include:
