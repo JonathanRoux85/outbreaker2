@@ -28,15 +28,16 @@ burning <- n_iter_mcmc*0.01
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
 
-# Initialization of poisson scale #
-init_poisson_scale <- 1
-move_poisson_scale <- TRUE
+# Initialization of psi #
+init_psi <- 1
+move_psi <- TRUE
 
 # Other parameters #
 move_sigma <- TRUE
 init_sigma <- 0.99
 move_pi <- TRUE
 init_pi <- 1
+prior_pi <- c(1,1)
 
 #############################
 #### Preparation of data ####
@@ -67,8 +68,8 @@ clusterExport(cl, c("dates", "n_cases", "transfer_matrix",
                     "cpe","ids",
                     "n_iter_mcmc", "n_sample", "burning",
                     "prior_alpha", "move_sigma", "init_sigma",
-                    "move_pi", "init_pi", "init_poisson_scale", 
-                    "move_poisson_scale"))
+                    "move_pi", "init_pi", "init_psi", 
+                    "move_psi", "prior_pi"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
@@ -91,8 +92,9 @@ out <- parLapply(cl, 4/seq(6,60,2), function(i) {
                                      init_sigma = init_sigma,
                                      move_pi = move_pi,
                                      init_pi = init_pi,
-                                     init_poisson_scale = init_poisson_scale, 
-                                     move_poisson_scale = move_poisson_scale)
+                                     init_psi = init_psi, 
+                                     move_psi = move_psi, 
+                                     prior_pi = prior_pi)
   return(list(output = output,
               rate = i))
 })

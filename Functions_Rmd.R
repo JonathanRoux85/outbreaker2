@@ -105,10 +105,10 @@ ParametersSynthesis <- function(index, vec_burning, location, type,
   )
   )
   
-  # Poisson scale #
-  poisson_scale <- unlist(lapply(results, 
+  # Psi #
+  psi <- unlist(lapply(results, 
                                  function(r) {
-                                   r$results_mcmc$res[r$results_mcmc$res$step>burning,]$poisson_scale
+                                   r$results_mcmc$res[r$results_mcmc$res$step>burning,]$psi
                                  }   
   )
   )
@@ -343,7 +343,7 @@ ParametersSynthesis <- function(index, vec_burning, location, type,
   ######
   output <- data.table(pi = ParametersEditing(pi,2,FALSE),
                        sigma = ParametersEditing(sigma,2,FALSE),
-                       poisson_scale = ParametersEditing(poisson_scale,2,FALSE),
+                       psi = ParametersEditing(psi,2,FALSE),
                        shannon_entropy = ParametersEditing(median_shannon_entropy,2,FALSE),
                        tp_links.consensus = ParametersEditing(tp_links.consensus,1,FALSE),
                        se_links.consensus = ParametersEditing(se_links.consensus,4,TRUE),

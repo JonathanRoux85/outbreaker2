@@ -18,7 +18,7 @@ source("./Functions_chains_reconstruction.R")
 ###########################
 #### Global parameters ####
 ###########################
-cores = 20
+cores = 8
 runs = 100
 
 n_iter_mcmc <- 50000
@@ -32,8 +32,8 @@ prior_alpha <- TRUE
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
 # Initialization of poisson scale #
-init_poisson_scale <- 1
-move_poisson_scale <- TRUE
+init_psi <- 1
+move_psi <- TRUE
 
 # Adding noise on dates of infection #
 adding_noise <- TRUE
@@ -44,6 +44,7 @@ move_sigma <- TRUE
 init_sigma <- 0.99
 move_pi <- TRUE
 init_pi <- 1
+prior_pi <- c(1,1)
 
 #############################
 #### Preparation of data ####
@@ -133,15 +134,14 @@ w <- generation_time.dist[, p]
 ########################################
 #### Parameters for parallelization ####
 ########################################
-ncores <- 20
-cl <- makeCluster(ncores)
+cl <- makeCluster(cores)
 clusterExport(cl, c("dates", "w", "n_cases", "fakeMat", 
                     "ids", "detect100", "chains_detect100_bind", 
                     "n_iter_mcmc", "n_sample", "burning",
                     "min.support", "prior_alpha", "adding_noise", 
                     "lambda_noise", "move_sigma", "init_sigma",
-                    "move_pi", "init_pi", "init_poisson_scale", 
-                    "move_poisson_scale"))
+                    "move_pi", "init_pi", "init_psi", 
+                    "move_psi", "prior_pi"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, library(fitdistrplus))
@@ -169,12 +169,13 @@ out <- parLapply(cl, 1:runs, function(line) {
                                 init_sigma = init_sigma,
                                 move_pi = move_pi,
                                 init_pi = init_pi,
-                                init_poisson_scale = init_poisson_scale, 
-                                move_poisson_scale = move_poisson_scale)
+                                init_psi = init_psi, 
+                                move_psi = move_psi,
+                                prior_pi = prior_pi)
   return(output)
 })
 
-saveRDS(out, file = paste0("1-results_",n_iter_mcmc,"_",n_sample,"_parLapply.rds"))
+saveRDS(out, file = paste0("1-results_",n_iter_mcmc,"_",n_sample,"_parLapply_scenario2.rds"))
 
 stopCluster(cl)
 

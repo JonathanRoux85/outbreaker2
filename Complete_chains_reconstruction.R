@@ -17,9 +17,9 @@ source("./Functions_chains_reconstruction.R")
 ###########################
 #### Global parameters ####
 ###########################
-n_iter_mcmc <- 250000
-n_sample <- n_iter_mcmc*0.0001
-burning <- n_iter_mcmc*0.01
+n_iter_mcmc <- 1000
+n_sample <- 1
+burning <- 0
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -27,8 +27,8 @@ prior_alpha <- TRUE
 # Minimal support #
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
-# Initialization of poisson scale #
-init_poisson_scale <- 1
+# Initialization of psi #
+init_psi <- 1
 
 # Adding noise on dates of infection #
 adding_noise <- FALSE
@@ -152,13 +152,14 @@ if(prior_alpha == T){
                      FUN = prior_ancestor,
                      imported = imported,
                      data_outbreaker = data_outbreaker,
-                     fakeMat = fakeMat)
+                     fakeMat = fakeMat,
+                     ids = ids)
 }
 
 # Config parameters #
-config <- create_config(prior_poisson_scale = c(1, 1),
-                        move_poisson_scale = TRUE,
-                        init_potential_colonised = n_cases*init_poisson_scale,
+config <- create_config(prior_psi = c(1, 1),
+                        move_psi = TRUE,
+                        init_potential_colonised = n_cases*init_psi,
                         # sd_potential_colonised = 5,
                         pb = TRUE,
                         find_import = FALSE,
@@ -167,11 +168,12 @@ config <- create_config(prior_poisson_scale = c(1, 1),
                         init_tree = imported,
                         n_iter = n_iter_mcmc, 
                         sample_every = n_sample,
-                        init_poisson_scale = init_poisson_scale,
+                        init_psi = init_psi,
                         move_sigma = TRUE,
                         init_sigma = 0.9,
                         move_pi = TRUE,
-                        init_pi = 1)
+                        init_pi = 1,
+                        prior_pi = c(1,1))
 
 # Reconstruction of chains #
 results_mcmc <- ComputeBayesian(outbreaker_data = data_outbreaker, 

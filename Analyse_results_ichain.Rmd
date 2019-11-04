@@ -228,7 +228,7 @@ names(output_parameters) <- as.character(paste0("Scenario ",1:no_scenarii))
 output_parameters[, parameter := c("No. of iterations", "Thinning", "Burning period",
                            "Noise added", 
                            "Value of pi", "Value of sigma",
-                           "Value of poisson_scale", "Shannon entropy",
+                           "Value of psi", "Shannon entropy",
                            "Consensus-No links retrieved",
                            "Consensus-Sensitivity", "Consensus-% chains reconstructed",
                            "All ancestors-Sensitivity", "All ancestors-Specificity",

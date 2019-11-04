@@ -28,7 +28,7 @@ prior_alpha <- TRUE
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
 # Initialization of poisson scale #
-init_poisson_scale <- 1
+init_psi <- 1
 
 # Adding noise on dates of infection #
 adding_noise <- FALSE
@@ -233,9 +233,9 @@ if(prior_alpha == T){
 }
 
 # Config parameters #
-config <- create_config(prior_poisson_scale = c(1, 1),
-                        move_poisson_scale = TRUE,
-                        init_potential_colonised = n_cases*init_poisson_scale,
+config <- create_config(prior_psi = c(1, 1),
+                        move_psi = TRUE,
+                        init_potential_colonised = n_cases*init_psi,
                         # sd_potential_colonised = 5,
                         pb = TRUE,
                         find_import = FALSE,
@@ -244,7 +244,7 @@ config <- create_config(prior_poisson_scale = c(1, 1),
                         init_tree = imported,
                         n_iter = n_iter_mcmc, 
                         sample_every = n_sample,
-                        init_poisson_scale = init_poisson_scale,
+                        init_psi = init_psi,
                         move_sigma = TRUE,
                         init_sigma = 0.9,
                         move_pi = TRUE,

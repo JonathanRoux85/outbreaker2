@@ -29,9 +29,9 @@ burning <- n_iter_mcmc*0.01
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
 
-# Initialization of poisson scale #
-init_poisson_scale <- 1
-move_poisson_scale <- TRUE
+# Initialization of psi #
+init_psi <- 1
+move_psi <- TRUE
 
 # Other parameters #
 move_sigma <- TRUE
@@ -77,8 +77,8 @@ output <- RealChainsReconstruction(dates = dates,
                                    init_sigma = init_sigma,
                                    move_pi = move_pi,
                                    init_pi = init_pi,
-                                   init_poisson_scale = init_poisson_scale, 
-                                   move_poisson_scale = move_poisson_scale)
+                                   init_psi = init_psi, 
+                                   move_psi = move_psi)
 
 
 

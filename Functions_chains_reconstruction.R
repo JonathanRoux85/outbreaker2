@@ -471,7 +471,7 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                                  n_iter_mcmc, n_sample, min.support,
                                  prior_alpha, burning,
                                  adding_noise, lambda_noise,
-                                 init_poisson_scale, move_poisson_scale,
+                                 init_psi, move_psi,
                                  init_sigma, move_sigma,
                                  init_pi, move_pi, prior_pi){
   ## Adding noise on dates if needed ##
@@ -510,9 +510,9 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
   }
   
   # Config parameters #
-  config <- create_config(prior_poisson_scale = c(1, 1),
-                          move_poisson_scale = move_poisson_scale,
-                          init_potential_colonised = n_cases*init_poisson_scale,
+  config <- create_config(prior_psi = c(1, 1),
+                          move_psi = move_psi,
+                          init_potential_colonised = n_cases*init_psi,
                           # sd_potential_colonised = 5,
                           pb = TRUE,
                           find_import = FALSE,
@@ -521,7 +521,7 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                           init_tree = imported,
                           n_iter = n_iter_mcmc, 
                           sample_every = n_sample,
-                          init_poisson_scale = init_poisson_scale,
+                          init_psi = init_psi,
                           move_sigma = move_sigma,
                           init_sigma = init_sigma,
                           move_pi = move_pi,
@@ -553,9 +553,9 @@ RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
                                      imported,
                                      n_iter_mcmc, n_sample,
                                      prior_alpha, burning,
-                                     init_poisson_scale, move_poisson_scale,
+                                     init_psi, move_psi,
                                      init_sigma, move_sigma,
-                                     init_pi, move_pi){
+                                     init_pi, move_pi, prior_pi){
   # Data #
   data_outbreaker <- outbreaker_data(dates = dates,
                                      w_dens = w,
@@ -576,9 +576,9 @@ RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
   }
   
   # Config parameters #
-  config <- create_config(prior_poisson_scale = c(1, 1),
-                          move_poisson_scale = move_poisson_scale,
-                          init_potential_colonised = n_cases*init_poisson_scale,
+  config <- create_config(prior_psi = c(1, 1),
+                          move_psi = move_psi,
+                          init_potential_colonised = n_cases*init_psi,
                           # sd_potential_colonised = 5,
                           pb = TRUE,
                           find_import = FALSE,
@@ -587,11 +587,12 @@ RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
                           init_tree = imported,
                           n_iter = n_iter_mcmc, 
                           sample_every = n_sample,
-                          init_poisson_scale = init_poisson_scale,
+                          init_psi = init_psi,
                           move_sigma = move_sigma,
                           init_sigma = init_sigma,
                           move_pi = move_pi,
-                          init_pi = init_pi)
+                          init_pi = init_pi,
+                          prior_pi = prior_pi)
   
   # Reconstruction of chains #
   results_mcmc <- ComputeBayesian(outbreaker_data = data_outbreaker, 
