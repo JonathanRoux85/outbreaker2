@@ -31,7 +31,7 @@ outbreaker_mcmc_store <- function(param_current, param_store, data, config,
   param_store$eps[counter] <- param_current$eps
   param_store$lambda[counter] <- param_current$lambda
   param_store$sigma[counter] <- param_current$sigma
-  param_store$poisson_scale[counter] <- param_current$poisson_scale
+  param_store$psi[counter] <- param_current$psi
   
   param_store$alpha[[counter]] <- param_current$alpha
   param_store$t_inf[[counter]] <- param_current$t_inf

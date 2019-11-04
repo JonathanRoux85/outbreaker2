@@ -174,19 +174,19 @@ create_config <- function(..., data = NULL) {
                    init_eps = 0.5,
                    init_lambda = 0.05,
                    init_sigma = 0.05,
-                   init_poisson_scale = 1,
+                   init_psi = 1,
                    init_potential_colonised = NULL,
                    move_alpha = TRUE, 
                    move_swap_cases = TRUE,
                    move_t_inf = TRUE,
                    move_mu = TRUE, move_kappa = TRUE, move_pi = TRUE,
                    move_eps = TRUE, move_lambda = TRUE, move_sigma = TRUE,
-                   move_poisson_scale = TRUE,
+                   move_psi = TRUE,
                    # move_potential_colonised = TRUE,
                    n_iter = 1e4, sample_every = 50,
                    sd_mu = 0.0001, sd_pi = 0.1,
                    sd_eps = 0.1, sd_lambda = 0.05, sd_sigma = 0.05,
-                   sd_poisson_scale = 0.1,
+                   sd_psi = 0.1,
                    # sd_potential_colonised = 1,
                    prop_alpha_move = 1/4,
                    prop_t_inf_move = 0.2,
@@ -202,7 +202,7 @@ create_config <- function(..., data = NULL) {
                    prior_eps = c(1,1),
                    prior_sigma = c(1,1),
                    prior_lambda = c(1,1),
-                   prior_poisson_scale = c(1, 1),
+                   prior_psi = c(1, 1),
                    ctd_directed = FALSE,
                    pb = FALSE)
 
@@ -323,15 +323,15 @@ create_config <- function(..., data = NULL) {
     stop("init_sigma is infinite or NA")
   }
 
-  ## check init_poisson_scale
-  if (!is.numeric(config$init_poisson_scale)) {
-    stop("init_poisson_scale is not a numeric value")
+  ## check init_psi
+  if (!is.numeric(config$init_psi)) {
+    stop("init_psi is not a numeric value")
   }
-  if (config$init_poisson_scale < 0) {
-    stop("init_poisson_scale is negative")
+  if (config$init_psi < 0) {
+    stop("init_psi is negative")
   }
-  if (!is.finite(config$init_poisson_scale)) {
-    stop("init_poisson_scale is infinite or NA")
+  if (!is.finite(config$init_psi)) {
+    stop("init_psi is infinite or NA")
   }
 
   ## check init_potential_colonised
@@ -426,12 +426,12 @@ create_config <- function(..., data = NULL) {
   #   stop("move_potential_colonised is NA")
   # }
 
-  ## check move_poisson_scale
-  if (!all(is.logical(config$move_poisson_scale))) {
-    stop("move_poisson_scale is not a logical")
+  ## check move_psi
+  if (!all(is.logical(config$move_psi))) {
+    stop("move_psi is not a logical")
   }
-  if (any(is.na(config$move_poisson_scale))) {
-    stop("move_poisson_scale is NA")
+  if (any(is.na(config$move_psi))) {
+    stop("move_psi is NA")
   }
 
   
@@ -514,15 +514,15 @@ create_config <- function(..., data = NULL) {
     stop("sd_sigma is infinite or NA")
   }
 
-  ## check sd_poisson_scale
-  if (!is.numeric(config$sd_poisson_scale)) {
-    stop("sd_poisson_scale is not a numeric value")
+  ## check sd_psi
+  if (!is.numeric(config$sd_psi)) {
+    stop("sd_psi is not a numeric value")
   }
-  if (config$sd_poisson_scale < 1e-10) {
-    stop("sd_poisson_scale is close to zero or negative")
+  if (config$sd_psi < 1e-10) {
+    stop("sd_psi is close to zero or negative")
   }
-  if (!is.finite(config$sd_poisson_scale)) {
-    stop("sd_poisson_scale is infinite or NA")
+  if (!is.finite(config$sd_psi)) {
+    stop("sd_psi is infinite or NA")
   }
 
   # ## check sd_potential_colonised
@@ -700,18 +700,18 @@ create_config <- function(..., data = NULL) {
     stop("prior_sigma is has values which are infinite or NA")
   }
 
-  ## check prior value for poisson_scale
-  if (!all(is.numeric(config$prior_poisson_scale))) {
-    stop("prior_poisson_scale has non-numeric values")
+  ## check prior value for psi
+  if (!all(is.numeric(config$prior_psi))) {
+    stop("prior_psi has non-numeric values")
   }
-  if (any(config$prior_poisson_scale < 0)) {
-    stop("prior_poisson_scale has negative values")
+  if (any(config$prior_psi < 0)) {
+    stop("prior_psi has negative values")
   }
-  if (length(config$prior_poisson_scale)!=2L) {
-    stop("prior_poisson_scale should be a vector of length 2")
+  if (length(config$prior_psi)!=2L) {
+    stop("prior_psi should be a vector of length 2")
   }
-  if (!all(is.finite(config$prior_poisson_scale))) {
-    stop("prior_poisson_scale is has values which are infinite or NA")
+  if (!all(is.finite(config$prior_psi))) {
+    stop("prior_psi is has values which are infinite or NA")
   }
 
   

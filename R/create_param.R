@@ -117,7 +117,7 @@ create_param <- function(data = outbreaker_data(),
   size <- round(config$n_iter/config$sample_every)
   step <- integer(size)
   post <- prior <- like <- mu <- pi <- eps <-
-    lambda <- sigma <- poisson_scale <- double(size)
+    lambda <- sigma <- psi <- double(size)
   alpha <- as.list(integer(size))
   t_inf <- as.list(integer(size))
   kappa <- as.list(integer(size))
@@ -132,7 +132,7 @@ create_param <- function(data = outbreaker_data(),
   current_eps <- eps[1] <- config$init_eps
   current_lambda <- lambda[1] <- config$init_lambda
   current_sigma <- sigma[1] <- config$init_sigma
-  current_poisson_scale <- poisson_scale[1] <- config$init_poisson_scale
+  current_psi <- psi[1] <- config$init_psi
   if (is.null(config$init_t_inf)) {
     current_t_inf <- t_inf[[1]] <- data$dates - which.max(data$f_dens) + 1L
   } else {
@@ -149,7 +149,7 @@ create_param <- function(data = outbreaker_data(),
   store <- list(size = size, step = step, post = post, like = like,
                 prior = prior, alpha = alpha, t_inf = t_inf, mu = mu,
                 kappa = kappa, pi = pi, eps = eps, lambda = lambda,
-                sigma = sigma, poisson_scale = poisson_scale,
+                sigma = sigma, psi = psi,
                 potential_colonised = potential_colonised,
                 counter = counter)
   class(store) <- c("outbreaker_store", "list")
@@ -157,7 +157,7 @@ create_param <- function(data = outbreaker_data(),
   current  <- list(alpha = current_alpha, t_inf = current_t_inf,
                    mu = current_mu, kappa = current_kappa, pi = current_pi,
                    eps = current_eps, lambda = current_lambda,
-                   sigma = current_sigma, poisson_scale = current_poisson_scale,
+                   sigma = current_sigma, psi = current_psi,
                    potential_colonised = current_potential_colonised)
   class(current) <- c("outbreaker_param", "list")
 

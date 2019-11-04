@@ -48,7 +48,7 @@ outbreaker_mcmc_shape <- function(param, data) {
                       post = param$post, like = param$like, prior = param$prior,
                       mu = param$mu, pi = param$pi, eps = param$eps,
                       lambda = param$lambda, sigma = param$sigma,
-                      poisson_scale = param$poisson_scale,
+                      psi = param$psi,
                       param$alpha, param$t_inf, param$kappa,
                       param$potential_colonised)
   names(param) <- gsub("[.]", "_", names(param))

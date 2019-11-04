@@ -15,7 +15,7 @@ Rcpp::List cpp_move_lambda(Rcpp::List param, Rcpp::List data, Rcpp::List config,
 		       Rcpp::RObject custom_ll = R_NilValue,
 		       Rcpp::RObject custom_prior = R_NilValue);
 
-Rcpp::List cpp_move_poisson_scale(Rcpp::List param, Rcpp::List data, Rcpp::List config,
+Rcpp::List cpp_move_psi(Rcpp::List param, Rcpp::List data, Rcpp::List config,
                            Rcpp::RObject custom_ll = R_NilValue,
                            Rcpp::RObject custom_prior = R_NilValue);
 

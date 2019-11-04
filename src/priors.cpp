@@ -146,16 +146,16 @@ double cpp_prior_lambda(Rcpp::List param, Rcpp::List config,
 
 }
 
-// The prior for the non-transmision contact rate 'poisson_scale' is a gamma distribution
+// The prior for the 'psi' parameter is a gamma distribution
 // [[Rcpp::export(rng = false)]]
-double cpp_prior_poisson_scale(Rcpp::List param, Rcpp::List config,
+double cpp_prior_psi(Rcpp::List param, Rcpp::List config,
                         Rcpp::RObject custom_function = R_NilValue) {
   
   if (custom_function == R_NilValue) {
     // first value is shape, second is scale
-    Rcpp::NumericVector shape = config["prior_poisson_scale"];
+    Rcpp::NumericVector shape = config["prior_psi"];
     
-    return R::dgamma(Rcpp::as<double>(param["poisson_scale"]),
+    return R::dgamma(Rcpp::as<double>(param["psi"]),
                      (double) shape[0], 
 		     (double) shape[1],
 		     true);
@@ -179,7 +179,7 @@ double cpp_prior_all(Rcpp::List param, Rcpp::List config,
       cpp_prior_sigma(param, config) +
       cpp_prior_eps(param, config) +
       cpp_prior_lambda(param, config) +
-      cpp_prior_poisson_scale(param, config);
+      cpp_prior_psi(param, config);
 
   } else {
 
@@ -190,7 +190,7 @@ double cpp_prior_all(Rcpp::List param, Rcpp::List config,
       cpp_prior_sigma(param, config, list_functions["sigma"]) +
       cpp_prior_eps(param, config, list_functions["eps"]) +
       cpp_prior_lambda(param, config, list_functions["lambda"]) +
-      cpp_prior_poisson_scale(param, config, list_functions["poisson_scale"]);
+      cpp_prior_psi(param, config, list_functions["psi"]);
 
   }
 }

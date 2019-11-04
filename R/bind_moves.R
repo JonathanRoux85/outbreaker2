@@ -135,15 +135,15 @@ bind_moves <- function(moves = custom_moves(), config, data,
                                                 )
   }
 
-  ## remove move$sigma if disabled
-  if (!any(config$move_poisson_scale)) {
-    out$poisson_scale <- NULL
+  ## remove move$psi if disabled
+  if (!any(config$move_psi)) {
+    out$psi <- NULL
   } else {
-    out$poisson_scale <- bind_to_function(out$poisson_scale,
+    out$psi <- bind_to_function(out$psi,
                                           data = data,
                                           config = config,
                                           custom_ll = likelihoods$potential_colonised,
-                                          custom_prior = priors$poisson_scale
+                                          custom_prior = priors$psi
                                           )
   }
 

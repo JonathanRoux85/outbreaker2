@@ -138,7 +138,7 @@ custom_priors <- function(...) {
                      eps = NULL, # contact reporting coverage
                      lambda = NULL, # non-infectious contact rate
                      sigma = NULL, # hospital transfer probability
-                     poisson_scale = NULL # poisson scale
+                     psi = NULL # psi (ratio unobserved/observed cases)
                      )
 
     priors <- modify_defaults(defaults, priors, FALSE)
