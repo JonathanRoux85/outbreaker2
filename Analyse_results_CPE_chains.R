@@ -48,22 +48,26 @@ generation_time_mean <- gamma_shape / gamma_rate
   
 no_links_retrieved <- unlist(lapply(results, 
                                     function(r) {
-                                      r$output$res_consensus[is.na(from) | (support >= min_support &
-                                                                              kappa %in% 1:3), .N]
+                                      r$output$res_consensus[(support >= min_support &
+                                                                (kappa %in% 1:3 | is.na(kappa))), .N]
                                       }   
                                     ))
 
 community_episodes <- unlist(lapply(results, 
                                     function(r) {
-                                      r$output$res_consensus[is.na(from) & 
-                                                               !is.na(init_alpha), .N]
+                                      r$output$res_consensus[(support >= min_support &
+                                                                (kappa %in% 1:3 | is.na(kappa))) &
+                                                               (is.na(from) & 
+                                                                  !is.na(init_alpha)), .N]
                                       }   
                                     ))
 
 imported_episodes <- unlist(lapply(results, 
                                    function(r) {
-                                     r$output$res_consensus[is.na(from) & 
-                                                              is.na(init_alpha), .N]
+                                     r$output$res_consensus[(support >= min_support &
+                                                               (kappa %in% 1:3 | is.na(kappa))) &
+                                                              (is.na(from) & 
+                                                                 is.na(init_alpha)), .N]
                                      }   
                                    ))
 
@@ -73,15 +77,15 @@ data_plot <- data.table(generation_time_mean = generation_time_mean,
                         imported_episodes = imported_episodes)
 
 FigPlot_nolinks <- ggplot(data_plot, aes(x = generation_time_mean)) +
-  geom_line(aes(y = no_links_retrieved)) +
-  geom_point(aes(y = no_links_retrieved)) + 
+  geom_line(aes(y = no_links_retrieved), size = 1.3) +
+  geom_point(aes(y = no_links_retrieved), size = 2.5) + 
   geom_vline(xintercept = generation_time_mean[which.max(no_links_retrieved)],
              linetype="dashed", 
              color = "black",
-             size = 1.1) +
+             size = 1.2) +
   theme_minimal() +
   xlab("Mean of CPE generation interval") + 
-  ylab("#Episodes with links retrieved") +
+  ylab("# links identified") +
   theme(axis.title.x = element_text(size = 50),
         axis.title.y = element_text(size = 50),
         axis.text.x = element_text(size = 40),
@@ -114,14 +118,14 @@ FigPlot <- ggplot(data_plot, aes(x = generation_time_mean)) +
   scale_fill_manual(name="",
                     values=c('imported'='#0056A3', 'community'='#1F83AE',
                              'links_retrieved'='#A5C3DE', 'not_retrieved'='#F0F8FF'),
-                    labels=c('imported'='Imported episodes',
+                    labels=c('imported'='Foreign-imported episodes',
                              'community'='Community-imported episodes',
                              'links_retrieved'='Episodes with enough support',
                              'not_retrieved'='Episodes without enough support')) +
   geom_vline(xintercept = generation_time_mean[which.max(no_links_retrieved)],
              linetype="dashed", 
              color = "black",
-             size = 1.1) + 
+             size = 1.2) + 
   xlab("Mean of CPE generation interval") +
   ylab("% of links") +
   theme_minimal() +
