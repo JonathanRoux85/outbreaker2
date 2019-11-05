@@ -143,7 +143,8 @@ get_labels <- function(x, labels = NULL) {
 ######################################################################################
 ## Main function to compute sensitivity and specificity ##
 ComputeParameters <- function(results_bayesian, real_data, min.support,
-                              burning = 0, init_alpha, ids){
+                              burning = 0, init_alpha, ids, 
+                              include_imported = FALSE){
   ## Preparing data (merging with real data) ##
   # cat("--- Preparing data ---")
   if(burning < 0) 
@@ -212,6 +213,13 @@ ComputeParameters <- function(results_bayesian, real_data, min.support,
   merged_consensus <- merged_consensus[to %in% real_data[,ids_to]]
   merged_aa <- merged_aa[to %in% real_data[,ids_to]]
   
+  if(!include_imported){
+    merged_consensus <- merged_consensus[!(is.na(init_alpha) & !is.na(time)),]
+    merged_aa <- merged_aa[!(is.na(init_alpha) & !is.na(time)),]
+  }
+  
+  max_links_retrieved <- merged_consensus[,length(unique(to))]
+  
   ## Computing parameters ##
   cat("\n--- Compute parameters using consensus ancestor ---")
   # Consensus ancestor #
@@ -248,6 +256,7 @@ ComputeParameters <- function(results_bayesian, real_data, min.support,
   
   return(list(minimal_support = min.support,
               shannon_entropy = shannon_entropy,
+              max_links_retrieved = max_links_retrieved,
               parameters_links_consensus = parameters_links_consensus,
               parameters_chains_consensus = list(global_chains_consensus = global_chains_consensus,
                                                  bylength_chains_consensus = bylength_chains_consensus),

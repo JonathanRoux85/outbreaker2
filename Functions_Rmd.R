@@ -58,7 +58,7 @@ ParametersAccordingSupport <- function(i, results, min.support){
               sp_97.5 = sp_links[3]))
 }
 
-#### Main function to synthetise the different parameters computed on the results of the BDLF ####
+#### Main function to synthetise the different parameters computed on the results of the BLDF ####
 ParametersSynthesis <- function(index, vec_burning, location, type,
                                 NotRetrieved = FALSE, chains_detect100_bind = NULL,
                                 StudyKappa = FALSE, new_chains_added = NULL,
