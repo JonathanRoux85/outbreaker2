@@ -151,7 +151,23 @@ outbreaker_data <- function(..., data = list(...)) {
     if (any(!is.finite(data$f_dens))) {
       stop("non-finite values detected in f_dens")
     }
+    
+    ## Remove trailing zeroes to prevent starting with -Inf temporal loglike
+    if(data$f_dens[length(data$f_dens)] < 1e-15) {
+      final_index <- max(which(data$f_dens > 1e-15))
+      data$f_dens <- data$f_dens[1:final_index]
+    }
+    
+    ## add new values 'f_dens'
+    ## to cover the span of the outbreak
+    ## (avoids starting with -Inf temporal loglike)
+    if (length(data$f_dens) < data$max_range) {
+      length_to_add <- (data$max_range-length(data$f_dens)) + 10 # +10 to be on the safe side
+      val_to_add <- rep(2.769828e-162,length_to_add)
+      data$f_dens <- c(data$f_dens, val_to_add)
+    }
 
+    ## standardize the mass function
     data$f_dens <- data$f_dens / sum(data$f_dens)
     data$log_f_dens <- log(data$f_dens)
   }
