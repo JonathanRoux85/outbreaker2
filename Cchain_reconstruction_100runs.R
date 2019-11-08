@@ -156,7 +156,7 @@ out <- parLapply(cl, 1:runs, function(line) {
                                 n_cases = n_cases, 
                                 fakeMat = fakeMat, 
                                 ids = ids,
-                                f_dens = 1,
+                                f_dens = dpois(1:length(dates), lambda_noise),
                                 detect100 = detect100, 
                                 chains_detect100_bind = chains_detect100_bind, 
                                 n_iter_mcmc = n_iter_mcmc, 
