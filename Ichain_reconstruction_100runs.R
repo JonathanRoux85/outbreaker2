@@ -32,7 +32,7 @@ prior_alpha <- TRUE
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
 # Include imported episodes in parameters #
-include.imported = FALSE
+include_imported = FALSE
 
 # Initialization of psi #
 init_psi <- 1
@@ -252,7 +252,7 @@ out <- parLapply(cl, 1:runs, function(line) {
                                 init_psi = init_psi, 
                                 move_psi = move_psi,
                                 prior_pi = prior_pi,
-                                include.imported = include.imported)
+                                include_imported = include_imported)
   return(output)
 })
 
