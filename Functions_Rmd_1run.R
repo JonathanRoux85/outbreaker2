@@ -179,7 +179,9 @@ ParametersSynthesis_1run <- function(results, burning,
   output <- data.table(pi = ParametersEditing(pi,2,FALSE),
                        sigma = ParametersEditing(sigma,2,FALSE),
                        psi = ParametersEditing(psi,2,FALSE),
-                       shannon_entropy = ParametersEditing(median_shannon_entropy[which(median_shannon_entropy != 0)],2,FALSE),
+                       shannon_entropy = ifelse(include_imported,
+                                                ParametersEditing(median_shannon_entropy,2,FALSE),
+                                                ParametersEditing(median_shannon_entropy[which(median_shannon_entropy != 0)],2,FALSE)),
                        tp_links.consensus = round(tp_links.consensus,0),
                        se_links.consensus = round(se_links.consensus*100,2),
                        global_chains_consensus = round(global_chains_consensus*100,2),
@@ -286,7 +288,7 @@ ParametersSynthesis_1run <- function(results, burning,
     kappa_new_links.dt <- kappa_new_links.dt[N != 0]
     
     ## Complete the output ##
-    list_output$kappa_new_links <- kappa_new_links.dt[, scenario := index]
+    list_output$kappa_new_links <- kappa_new_links.dt[, scenario := 1]
   }
   
   return(list_output)
