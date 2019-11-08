@@ -27,13 +27,19 @@ prior_alpha <- TRUE
 # Minimal support #
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
-# Initialization of poisson scale #
+# Include imported episodes in parameters #
+include.imported = FALSE
+
+# Initialization of psi #
 init_psi <- 1
 move_psi <- TRUE
 
 # Adding noise on dates of infection #
 adding_noise <- FALSE
 lambda_noise <- 3.5
+
+# Incubation time #
+f_dens <- 1
 
 # Other parameters #
 move_sigma <- TRUE
@@ -135,7 +141,7 @@ out <- ChainsReconstruction(dates = dates,
                             n_cases = n_cases, 
                             fakeMat = fakeMat, 
                             ids = ids,
-                            f_dens = 1,
+                            f_dens = f_dens,
                             detect100 = detect100, 
                             chains_detect100_bind = chains_detect100_bind, 
                             n_iter_mcmc = n_iter_mcmc, 
@@ -151,7 +157,8 @@ out <- ChainsReconstruction(dates = dates,
                             init_pi = init_pi,
                             init_psi = init_psi, 
                             move_psi = move_psi,
-                            prior_pi = prior_pi)
+                            prior_pi = prior_pi,
+                            include.imported = include.imported)
 
 saveRDS(out, file = paste0("1-Cchain_n",n_iter_mcmc,"_b",burning,"_t",n_sample,"_s1.rds"))
 

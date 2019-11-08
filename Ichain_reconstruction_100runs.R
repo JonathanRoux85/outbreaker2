@@ -31,7 +31,10 @@ prior_alpha <- TRUE
 # Minimal support #
 min.support <- 10^(-seq(0, 4, by = 0.05))
 
-# Initialization of poisson scale #
+# Include imported episodes in parameters #
+include.imported = FALSE
+
+# Initialization of psi #
 init_psi <- 1
 move_psi <- TRUE
 
@@ -248,7 +251,8 @@ out <- parLapply(cl, 1:runs, function(line) {
                                 init_pi = init_pi,
                                 init_psi = init_psi, 
                                 move_psi = move_psi,
-                                prior_pi = prior_pi)
+                                prior_pi = prior_pi,
+                                include.imported = include.imported)
   return(output)
 })
 

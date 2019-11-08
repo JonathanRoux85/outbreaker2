@@ -483,7 +483,8 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                                  adding_noise, lambda_noise,
                                  init_psi, move_psi,
                                  init_sigma, move_sigma,
-                                 init_pi, move_pi, prior_pi){
+                                 init_pi, move_pi, prior_pi,
+                                 include_imported){
   ## Adding noise on dates if needed ##
   if(adding_noise){
     dates <- round(dates + rpois(length(dates), 
@@ -558,7 +559,8 @@ ChainsReconstruction <- function(dates, w, n_cases, fakeMat, ids,
                                   min.support = min.support,
                                   burning = burning,
                                   init_alpha = imported,
-                                  ids = ids)
+                                  ids = ids, 
+                                  include_imported = include_imported)
   
   return(list(results_mcmc = results_mcmc,
               parameters = parameters))
