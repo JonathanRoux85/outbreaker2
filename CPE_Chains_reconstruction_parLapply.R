@@ -23,7 +23,7 @@ cores = 18
 
 n_iter_mcmc <- 50000
 n_sample <- n_iter_mcmc*0.0001
-burning <- n_iter_mcmc*0.01
+burning <- n_iter_mcmc*0.1
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -31,6 +31,9 @@ prior_alpha <- TRUE
 # Initialization of psi #
 init_psi <- 1
 move_psi <- TRUE
+
+# Incubation time #
+f_dens <- NULL
 
 # Other parameters #
 move_sigma <- TRUE
@@ -83,6 +86,7 @@ out <- parLapply(cl, 4/seq(6,60,2), function(i) {
                                      n_cases = n_cases, 
                                      transfers = transfer_matrix, 
                                      ids = ids,
+                                     f_dens = f_dens,
                                      imported = cpe[, imported], 
                                      n_iter_mcmc = n_iter_mcmc, 
                                      n_sample = n_sample, 

@@ -577,21 +577,12 @@ RealChainsReconstruction <- function(dates, w, n_cases, transfers, ids,
                                      init_sigma, move_sigma,
                                      init_pi, move_pi, prior_pi){
   # Data #
-  # Check incubation time #
-  if(is.null(f_dens)){
-    data_outbreaker <- outbreaker_data(dates = dates,
-                                       w_dens = w,
-                                       n_cases = n_cases,
-                                       hosp_matrix = fakeMat,
-                                       ids = ids)
-  }
-  else
-    data_outbreaker <- outbreaker_data(dates = dates,
-                                       w_dens = w,
-                                       n_cases = n_cases,
-                                       hosp_matrix = fakeMat,
-                                       ids = ids,
-                                       f_dens = f_dens)
+  data_outbreaker <- outbreaker_data(dates = dates,
+                                     w_dens = w,
+                                     n_cases = n_cases,
+                                     hosp_matrix = transfers,
+                                     ids = ids,
+                                     f_dens = f_dens)
   
   imported <- ifelse(imported == 1, NA_integer_, 1)
   
