@@ -32,6 +32,9 @@ prior_alpha <- TRUE
 init_psi <- 1
 move_psi <- TRUE
 
+# Incubation time #
+f_dens <- NULL
+
 # Other parameters #
 move_sigma <- TRUE
 init_sigma <- 0.99
@@ -69,7 +72,7 @@ clusterExport(cl, c("dates", "n_cases", "transfer_matrix",
                     "n_iter_mcmc", "n_sample", "burning",
                     "prior_alpha", "move_sigma", "init_sigma",
                     "move_pi", "init_pi", "init_psi", 
-                    "move_psi", "pior_pi"))
+                    "move_psi", "pior_pi", "f_dens"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
@@ -77,12 +80,13 @@ clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
 ################################
 #### Chains' reconstruction ####
 ################################
-out <- parLapply(cl, rep(4/seq(8,48,8),30), function(i, real_dates) {
-  output <- RealChainsReconstruction(dates = sample(real_dates, replace = FALSE), 
+out <- parLapply(cl, rep(4/seq(6,60,2),30), function(i) {
+  output <- RealChainsReconstruction(dates = sample(dates, replace = FALSE), 
                                      w = dgamma(1:50, shape = 4, rate = i), 
                                      n_cases = n_cases, 
                                      transfers = transfer_matrix, 
                                      ids = ids,
+                                     f_dens = f_dens,
                                      imported = cpe[, imported], 
                                      n_iter_mcmc = n_iter_mcmc, 
                                      n_sample = n_sample, 
@@ -97,8 +101,7 @@ out <- parLapply(cl, rep(4/seq(8,48,8),30), function(i, real_dates) {
                                      prior_pi = prior_pi)
   return(list(output = output,
               rate = i))
-}, 
-real_dates = dates)
+})
 
 stopCluster(cl)
 
