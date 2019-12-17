@@ -153,7 +153,7 @@ clusterExport(cl, c("dates", "n_cases", "fakeMat",
                     "lambda_noise", "move_sigma", "init_sigma",
                     "move_pi", "init_pi", "init_psi", 
                     "move_psi", "prior_pi","include_imported",
-                    "f_dens"))
+                    "f_dens","variation_coef","mean_generation"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, library(fitdistrplus))
@@ -164,7 +164,7 @@ clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
 ################################
 out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
   output = ChainsReconstruction(dates = dates, 
-                                w = dgamma(1:50, shape = 1/variation_coef^2, rate = i), 
+                                w = dgamma(1:100, shape = 1/variation_coef^2, rate = i), 
                                 n_cases = n_cases, 
                                 fakeMat = fakeMat, 
                                 ids = ids,
