@@ -162,7 +162,7 @@ clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
 ################################
 #### Chains' reconstruction ####
 ################################
-out <- parLapply(cl, variation_coef/mean_generation, function(i) {
+out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
   output = ChainsReconstruction(dates = dates, 
                                 w = dgamma(1:50, shape = 1/variation_coef^2, rate = i), 
                                 n_cases = n_cases, 
