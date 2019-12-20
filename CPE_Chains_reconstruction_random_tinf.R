@@ -72,7 +72,7 @@ clusterExport(cl, c("dates", "n_cases", "transfer_matrix",
                     "n_iter_mcmc", "n_sample", "burning",
                     "prior_alpha", "move_sigma", "init_sigma",
                     "move_pi", "init_pi", "init_psi", 
-                    "move_psi", "pior_pi", "f_dens"))
+                    "move_psi", "prior_pi", "f_dens"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
