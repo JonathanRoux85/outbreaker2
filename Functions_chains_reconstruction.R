@@ -728,8 +728,8 @@ plot_network <- function(results, min_support){
 #############################################################################################
 #### Function to compute the results of simulated chains using different generation time ####
 #############################################################################################
-ParametersSynthesis_generation <- function(results, burning, min.support){
-    
+ParametersSynthesis_generation <- function(results, burning, min.support, 
+                                           real_chains,include_imported){
     ###################################
     #### Computation of parameters ####
     ###################################
@@ -737,56 +737,31 @@ ParametersSynthesis_generation <- function(results, burning, min.support){
     ### Global parameters ###
     ######
     # Pi #
-    pi <- results$results_mcmc$res[results$results_mcmc$res$step>burning,]$pi
+    pi <- results$res[results$res$step>burning,]$pi
     
     # Sigma #
-    sigma <- results$results_mcmc$res[results$results_mcmc$res$step>burning,]$sigma
+    sigma <- results$res[results$res$step>burning,]$sigma
     
     # Psi #
-    psi <- results$results_mcmc$res[results$results_mcmc$res$step>burning,]$psi
+    psi <- results$res[results$res$step>burning,]$psi
     
     # Median Shannon entropy #
     # Already computed using burning period #
-    median_shannon_entropy <- results$results_mcmc$res_aa[to %in%
-                                                            chains_detect100_bind[,ids_to],
-                                                          .(result=-sum(support*log(support))),
-                                                          by="to"][,result]
-    
+    median_shannon_entropy <- results$res_aa[to %in%
+                                               chains_detect100_bind[,ids_to],
+                                             .(result=-sum(support*log(support))),
+                                             by="to"][,result]
     ######
-    ### Consensus ancestor ###
+    ### Compute parameters ###
     ######
-    # Already computed using burning period #
-    # Number of true positive links #
-    tp_links.consensus <- results$parameters$parameters_links_consensus$tp_links.consensus
-    
-    # Sensitivity #
-    se_links.consensus <- results$parameters$parameters_links_consensus$se_links.consensus
-    
-    # Percentage of global chains reconstructed #
-    global_chains_consensus <- results$parameters$parameters_chains_consensus$global_chains_consensus
-    
-    ######
-    ### Ancestors with minimal support ###
-    ######
-    index_support <- last(which(results$parameters$minimal_support >= min.support))
-    # Sensitvity #
-    se_links.minimal <- results$parameters$parameters_links_aa$se_links.aa[index_support]
-    
-    # Specificity #
-    sp_links.minimal <- results$parameters$parameters_links_aa$sp_links.aa[index_support]
-    
-    # Number of links correctly retrieved #
-    tp_links.minimal <- results$parameters$parameters_links_aa$tp_links.aa[index_support]
-    
-    # Positive predictive value #
-    ppv_links.minimal <- results$parameters$parameters_links_aa$ppv_links.aa[index_support]
-    
-    # Negative predictive value #
-    npv_links.minimal <- results$parameters$parameters_links_aa$npv_links.aa[index_support]
-    
-    # Percentage of entire chains reconstructed #
-    global_chains.minimal <- results$parameters$parameters_chains_aa$global_chains_aa[index_support]
-    
+    parameters <- ComputeParameters(results_bayesian = results,
+                                    real_data = real_chains,
+                                    min.support = min.support,
+                                    burning = 0,
+                                    init_alpha = NULL,
+                                    ids = NULL, 
+                                    include_imported = include_imported)
+
     ######
     ### Creation of result data.table ###
     ######
@@ -796,15 +771,15 @@ ParametersSynthesis_generation <- function(results, burning, min.support){
                          shannon_entropy = ifelse(include_imported,
                                                   ParametersEditing(median_shannon_entropy,2,FALSE),
                                                   ParametersEditing(median_shannon_entropy[which(median_shannon_entropy != 0)],2,FALSE)),
-                         tp_links.consensus = round(tp_links.consensus,0),
-                         se_links.consensus = round(se_links.consensus*100,2),
-                         global_chains_consensus = round(global_chains_consensus*100,2),
-                         se_links.minimal = round(se_links.minimal,4)*100,
-                         sp_links.minimal = round(sp_links.minimal,4)*100,
-                         tp_links.minimal = round(tp_links.minimal,4),
-                         ppv_links.minimal = round(ppv_links.minimal,4)*100,
-                         npv_links.minimal = round(npv_links.minimal,4)*100,
-                         global_chains.minimal = round(global_chains.minimal,4)*100
+                         tp_links.consensus = round(parameters$parameters_links_consensus$tp_links.consensus,0),
+                         se_links.consensus = round(parameters$parameters_links_consensus$se_links.consensus*100,2),
+                         global_chains_consensus = round(parameters$parameters_chains_consensus$global_chains_consensus*100,2),
+                         se_links.aa = round(parameters$parameters_links_aa$se_links.aa,4)*100,
+                         sp_links.aa = round(parameters$parameters_links_aa$sp_links.aa,4)*100,
+                         tp_links.aa = round(parameters$parameters_links_aa$tp_links.aa,4),
+                         ppv_links.aa = round(parameters$parameters_links_aa$ppv_links.aa,4)*100,
+                         npv_links.aa = round(parameters$parameters_links_aa$npv_links.aa,4)*100,
+                         global_chains.aa = round(parameters$parameters_chains_aa$global_chains_aa,4)*100
     )
     
     return(output)
