@@ -18,17 +18,19 @@ source("./Functions_chains_reconstruction.R")
 ###########################
 #### Global parameters ####
 ###########################
-cores = 21
+cores = 25
 
 n_iter_mcmc <- 50000
 n_sample <- n_iter_mcmc*0.0001
 burning <- n_iter_mcmc*0.1
 
 # Coefficient of variation used for generation time #
-variation_coef <- 0.1
-variation_coef_label <- "01"
-# Mean of generation interval time #
-mean_generation <- seq(5,45,1)
+# variation_coef <- 0.1
+# variation_coef_label <- "01"
+# Mean of generation interval time distribution #
+mean_generation <- seq(1,75,1)
+# Standard deviation of the generation interval time distribution #
+sd_generation <- 5
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -153,7 +155,8 @@ clusterExport(cl, c("dates", "n_cases", "fakeMat",
                     "lambda_noise", "move_sigma", "init_sigma",
                     "move_pi", "init_pi", "init_psi", 
                     "move_psi", "prior_pi","include_imported",
-                    "f_dens","variation_coef","mean_generation"))
+                    "f_dens","variation_coef","mean_generation",
+                    "sd_generation"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, library(fitdistrplus))
@@ -162,9 +165,9 @@ clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
 ################################
 #### Chains' reconstruction ####
 ################################
-out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
+out <- parLapply(cl, mean_generation / sd_generation, function(i) {
   output = ChainsReconstruction(dates = dates, 
-                                w = dgamma(1:100, shape = 1/variation_coef^2, rate = i), 
+                                w = dgamma(1:100, shape = i^2, rate = i / sd_generation), 
                                 n_cases = n_cases, 
                                 fakeMat = fakeMat, 
                                 ids = ids,
@@ -188,11 +191,12 @@ out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
                                 include_imported = include_imported,
                                 Parameters = FALSE)
   return(list(output = output,
-              rate = i))
+              rate = i / sd_generation,
+              shape = i^2))
 })
 
-saveRDS(out, file = paste0("1-Cchain_n",n_iter_mcmc,"_b",burning,"_t",n_sample,"_s1_generation_vc",
-                           variation_coef_label,".rds"))
+saveRDS(out, file = paste0("1-Cchain_n",n_iter_mcmc,"_b",burning,"_t",n_sample,"_s1_generation_sd",
+                           sd_generation,".rds"))
 
 stopCluster(cl)
 

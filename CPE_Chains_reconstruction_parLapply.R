@@ -19,17 +19,19 @@ source("./Functions_chains_reconstruction.R")
 ###########################
 #### Global parameters ####
 ###########################
-cores = 20
+cores = 30
 
 n_iter_mcmc <- 50000
 n_sample <- n_iter_mcmc*0.0001
 burning <- n_iter_mcmc*0.1
 
 # Coefficient of variation used for generation time #
-variation_coef <- 0.5
-variation_coef_label <- "05"
-# Mean of generation interval time #
-mean_generation <- seq(1,60,1)
+# variation_coef <- 0.5
+# variation_coef_label <- "05"
+# Mean of generation interval time distribution #
+mean_generation <- seq(1,30,1)
+# Standard deviation of the generation interval time distribution #
+sd_generation <- 5
 
 # Compute or not priors for alpha (ancestors) #
 prior_alpha <- TRUE
@@ -79,7 +81,8 @@ clusterExport(cl, c("dates", "n_cases", "transfer_matrix",
                     "prior_alpha", "move_sigma", "init_sigma",
                     "move_pi", "init_pi", "init_psi", 
                     "move_psi", "prior_pi", "f_dens",
-                    "variation_coef","mean_generation"))
+                    "variation_coef","mean_generation",
+                    "sd_generation"))
 clusterEvalQ(cl, library(outbreaker2))
 clusterEvalQ(cl, library(data.table))
 clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
@@ -87,9 +90,9 @@ clusterEvalQ(cl, source("./Functions_chains_reconstruction.R"))
 ################################
 #### Chains' reconstruction ####
 ################################
-out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
+out <- parLapply(cl, mean_generation / sd_generation, function(i) {
   output <- RealChainsReconstruction(dates = dates, 
-                                     w = dgamma(1:100, shape = 1/variation_coef^2, rate = i), 
+                                     w = dgamma(1:100, shape = i^2, rate = i / sd_generation), 
                                      n_cases = n_cases, 
                                      transfers = transfer_matrix, 
                                      ids = ids,
@@ -107,12 +110,13 @@ out <- parLapply(cl, 1/(mean_generation*variation_coef^2), function(i) {
                                      move_psi = move_psi, 
                                      prior_pi = prior_pi)
   return(list(output = output,
-              rate = i))
+              rate = i / sd_generation,
+              shape = i^2))
 })
 
 stopCluster(cl)
 
-saveRDS(out, file=paste0("RealChainsReconstruction_vc",variation_coef_label,".rds"))
+saveRDS(out, file=paste0("RealChainsReconstruction_sd",sd_generation,".rds"))
 
 # ###################################
 # #### Plot of resulting network ####
