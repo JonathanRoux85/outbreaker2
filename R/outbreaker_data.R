@@ -116,11 +116,15 @@ outbreaker_data <- function(..., data = list(...)) {
       stop("non-finite values detected in w_dens")
     }
 
-
     ## Remove trailing zeroes to prevent starting with -Inf temporal loglike
     if(data$w_dens[length(data$w_dens)] < 1e-15) {
       final_index <- max(which(data$w_dens > 1e-15))
       data$w_dens <- data$w_dens[1:final_index]
+    }
+    
+    ## Remove zeroes at the beginning of w_dens to avoid -Inf temporal loglike
+    if(any(data$w_dens == 0)) {
+      data$w_dens[which(data$w_dens == 0)] <- 1e-260
     }
 
     ## add an exponential tail summing to 1e-4 to 'w'
