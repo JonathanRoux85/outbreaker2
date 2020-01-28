@@ -25,6 +25,17 @@ library(ggrepel)
 #   setnames(x, c("t","hospID"), c("time","to"))
 # }
 
+#### Function to edit the parameters according to the pattern: median [Q1-Q3] ####
+ParametersEditing <- function(ResultVector, no_digits, percent){
+  quantiles <- round(quantile(ResultVector, 
+                              c(0.025,0.5,0.975), 
+                              na.rm = TRUE),
+                     no_digits) * ifelse(percent, 100, 1)
+  return(paste0(quantiles[2], 
+                " [", quantiles[1], "-",
+                quantiles[3], "]"))
+}
+
 ####################################
 #### Function to compute priors ####
 ####################################
@@ -730,9 +741,6 @@ plot_network <- function(results, min_support){
 #############################################################################################
 ParametersSynthesis_generation <- function(results, burning, min.support, 
                                            real_chains,include_imported){
-    ###################################
-    #### Computation of parameters ####
-    ###################################
     ######
     ### Global parameters ###
     ######
@@ -783,7 +791,64 @@ ParametersSynthesis_generation <- function(results, burning, min.support,
     )
     
     return(output)
-  }
+}
+
+
+########################################################################################
+#### Function to compute the results of real chains using different generation time ####
+########################################################################################
+ParametersSynthesis_CPEgeneration <- function(results, burning, min.support, distances){
+  ######
+  ### Merge of distances with results ###
+  ######
+  res_consensus <- merge(results$res_consensus, 
+                         distances,
+                         by.x = c("from_label", "to_label"),
+                         by.y = c("from", "to"),
+                         all.x = TRUE)
+  
+  ######
+  ### Compute parameters ###
+  ######
+  ## Number of links ##
+  no_links_identified <- res_consensus[support >= min_support &
+                                         kappa == 1, .N]
+  
+  community_episodes <- res_consensus[support < min_support |
+                                        kappa != 1, .N]
+  
+  imported_episodes <- res_consensus[is.na(init_alpha), .N]
+  
+  ## Distance between facilites ##
+  mean_distance_identified <- res_consensus[support >= min_support &
+                                              kappa == 1, 
+                                            mean(distance, na.rm = TRUE)]
+  
+  mean_distance_community <- res_consensus[support < min_support |
+                                             kappa != 1, 
+                                           mean(distance, na.rm = TRUE)]
+  
+  median_distance_identified <- res_consensus[support >= min_support &
+                                              kappa == 1, 
+                                            median(distance, na.rm = TRUE)]
+  
+  median_distance_community <- res_consensus[support < min_support |
+                                             kappa != 1, 
+                                           median(distance, na.rm = TRUE)]
+  
+  ######
+  ### Creation of result data.table ###
+  ######
+  output <- data.table(no_links_identified = no_links_identified,
+                       no_community_episodes = community_episodes,
+                       no_imported_episodes = imported_episodes,
+                       mean_distance_identified = mean_distance_identified,
+                       mean_distance_community = mean_distance_community,
+                       median_distance_identified = median_distance_identified,
+                       median_distance_community = median_distance_community)
+  
+  return(output)
+}
 
 
 

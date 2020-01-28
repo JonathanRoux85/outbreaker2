@@ -9,30 +9,30 @@ library(cowplot)
 #########################
 #### Loading of data ####
 #########################
-results <- readRDS("./tmp_results/Genouest/RealChainsReconstruction.rds")
+results <- readRDS("./results/Genouest/RealChainsReconstruction.rds")
 
 source("./Functions_chains_reconstruction.R")
 
-min_support <- 0.063
+min_support <- 0.1122
 gamma_shape <- 4
 max_episodes <- 3054
 
 ###########################################
 #### Modification of the burnin period ####
 ###########################################
-results <- lapply(results, function(r, burning){
-  outputBayesian <- CreateOutputBayesian(results_bayesian = r$output$res,
-                                         burning = burning,
-                                         init_alpha = r$output$res_consensus$init_alpha,
-                                         ids = r$output$res_consensus$to_label)
-  names(outputBayesian) <- c("res_consensus", "res_aa")
-  outputBayesian$res <- r$output$res
-  
-  return(list(output = outputBayesian,
-              rate = r$rate))
-  },
-  burning = 5000
-  )
+# results <- lapply(results, function(r, burning){
+#   outputBayesian <- CreateOutputBayesian(results_bayesian = r$output$res,
+#                                          burning = burning,
+#                                          init_alpha = r$output$res_consensus$init_alpha,
+#                                          ids = r$output$res_consensus$to_label)
+#   names(outputBayesian) <- c("res_consensus", "res_aa")
+#   outputBayesian$res <- r$output$res
+#   
+#   return(list(output = outputBayesian,
+#               rate = r$rate))
+#   },
+#   burning = 5000
+#   )
 
 ###################################
 #### Computation of parameters ####
@@ -48,26 +48,21 @@ generation_time_mean <- gamma_shape / gamma_rate
   
 no_links_retrieved <- unlist(lapply(results, 
                                     function(r) {
-                                      r$output$res_consensus[(support >= min_support &
-                                                                (kappa %in% 1:3 | is.na(kappa))), .N]
+                                      r$output$res_consensus[support >= min_support &
+                                                               kappa == 1, .N]
                                       }   
                                     ))
 
 community_episodes <- unlist(lapply(results, 
                                     function(r) {
-                                      r$output$res_consensus[(support >= min_support &
-                                                                (kappa %in% 1:3 | is.na(kappa))) &
-                                                               (is.na(from) & 
-                                                                  !is.na(init_alpha)), .N]
+                                      r$output$res_consensus[support < min_support |
+                                                                kappa != 1, .N]
                                       }   
                                     ))
 
 imported_episodes <- unlist(lapply(results, 
                                    function(r) {
-                                     r$output$res_consensus[(support >= min_support &
-                                                               (kappa %in% 1:3 | is.na(kappa))) &
-                                                              (is.na(from) & 
-                                                                 is.na(init_alpha)), .N]
+                                     r$output$res_consensus[is.na(init_alpha), .N]
                                      }   
                                    ))
 
@@ -76,10 +71,12 @@ data_plot <- data.table(generation_time_mean = generation_time_mean,
                         community_episodes = community_episodes,
                         imported_episodes = imported_episodes)
 
+chosen_generation_time <- which.max(no_links_retrieved)
+
 FigPlot_nolinks <- ggplot(data_plot, aes(x = generation_time_mean)) +
   geom_line(aes(y = no_links_retrieved), size = 1.3) +
   geom_point(aes(y = no_links_retrieved), size = 2.5) + 
-  geom_vline(xintercept = generation_time_mean[which.max(no_links_retrieved)],
+  geom_vline(xintercept = generation_time_mean[chosen_generation_time],
              linetype="dashed", 
              color = "black",
              size = 1.2) +
@@ -107,22 +104,18 @@ FigPlot <- ggplot(data_plot, aes(x = generation_time_mean)) +
                   ymax = imported_episodes / max_episodes * 100, 
                   fill = "imported"))+
   geom_ribbon(aes(ymin = imported_episodes / max_episodes * 100, 
-                  ymax = (imported_episodes + community_episodes) / max_episodes * 100, 
-                  fill= "community")) +
-  geom_ribbon(aes(ymin = (imported_episodes + community_episodes) / max_episodes * 100, 
-                  ymax = no_links_retrieved / max_episodes * 100, 
-                  fill = "links_retrieved")) +
-  geom_ribbon(aes(ymin = no_links_retrieved / max_episodes * 100, 
-                  ymax = 100, 
-                  fill = "not_retrieved")) +
+                  ymax = (imported_episodes + no_links_retrieved) / max_episodes * 100, 
+                  fill= "links_retrieved")) +
+  geom_ribbon(aes(ymin = (imported_episodes + no_links_retrieved) / max_episodes * 100, 
+                  ymax = (imported_episodes + community_episodes + no_links_retrieved) / max_episodes * 100, 
+                  fill = "community")) +
   scale_fill_manual(name="",
                     values=c('imported'='#0056A3', 'community'='#1F83AE',
-                             'links_retrieved'='#A5C3DE', 'not_retrieved'='#F0F8FF'),
+                             'links_retrieved'='#A5C3DE'),
                     labels=c('imported'='Foreign-imported episodes',
                              'community'='Community-imported episodes',
-                             'links_retrieved'='Episodes with enough support',
-                             'not_retrieved'='Episodes without enough support')) +
-  geom_vline(xintercept = generation_time_mean[which.max(no_links_retrieved)],
+                             'links_retrieved'='Episodes with enough support')) +
+  geom_vline(xintercept = generation_time_mean[chosen_generation_time],
              linetype="dashed", 
              color = "black",
              size = 1.2) + 
